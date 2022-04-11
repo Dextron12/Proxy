@@ -1,8 +1,6 @@
 #include <iostream>
 #include <direct.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <math.h>
 
 
 #include <glad\glad.h>
@@ -12,12 +10,11 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-unsigned int loadImage(std::string imgPath, GLenum format);
 
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   0.0f, 0.0f,    //bottom left
-    0.5f, -0.5f, 0.0f,      0.0f, 1.0f, 0.0f,   1.0f, 0.0f,      //bottom right
-    0.0f, 0.5f, 0.0f,       1.0f, 1.0f, 0.0f,   0.5f, 1.0f         //middle
+    -0.05f, 0.05f, 0.0f,     //bottom left
+    0.05f, -0.05f, 0.0f,      //bottom right
+    0.0f, -0.05f, 0.0f        //middle
 };
   
 
@@ -53,26 +50,16 @@ int main(int argc, char* argv[]){
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //Colour
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    //Texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
     std::string baseDir = _getcwd(NULL, NULL);
+    std::string vShader = "/Shaders/shader.vs";
 
     Shader shaderProgram(baseDir + "/Shaders/shader.vs", baseDir + "/Shaders/shader.fs");
-    
 
-
-    loadImage(baseDir + "\\Textures\\wall.jpg", GL_RGB);
-
-    
+    shaderProgram.use();
+    shaderProgram.setVec4("ourColour", 0.4f, 0.6f, 0.9f, 1.0f);
 
 
     //main loop
@@ -81,8 +68,6 @@ int main(int argc, char* argv[]){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput(window);
-
-        shaderProgram.use();
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -103,22 +88,4 @@ void processInput(GLFWwindow* window){
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, true);
     }
-
-}
-
-unsigned int loadImage(std::string imgPath, GLenum format){
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(imgPath.c_str(), &width, &height, &nrChannels, 0);
-    if (data){
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Texture: (" << imgPath << ")\nCould not be loaded." << std::endl;
-    }
-    stbi_image_free(data);
-    return texture;
 }
