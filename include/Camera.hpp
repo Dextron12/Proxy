@@ -59,13 +59,15 @@ class Camera{
 
 
         void updateKeyboard(cameraMovement direction, float deltaTime){
+
+            float velocity = Speed * deltaTime;
             
             if (direction == FORWARD){
-                Position += Speed * deltaTime;
+                Position += Front * velocity;
             }
 
             if (direction == BACKWARD){
-                Position -= Speed * deltaTime;
+                Position -= Front * velocity;
             }
 
             if (direction == LEFT){

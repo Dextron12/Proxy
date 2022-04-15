@@ -12,8 +12,12 @@
 #include <glm\gtc\type_ptr.hpp>
 
 #include "Shader.hpp"
+#include "Camera.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_Callback(GLFWwindow* window, double xpos, double ypos);
+void mouseScrollCallback(GLFWwindow* window, double xoffste, double yoffset);
+
 void processInput(GLFWwindow* window);
 
 unsigned int loadImage(std::string imgPath, GLenum format);
@@ -82,6 +86,8 @@ glm::vec3 cubePositions[] = {
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+
 
 int main(int argc, char* argv[]){
     glfwInit();
@@ -110,6 +116,7 @@ int main(int argc, char* argv[]){
 
     //Set callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_Callback);
 
 
     glEnable(GL_DEPTH_TEST);
@@ -129,26 +136,27 @@ int main(int argc, char* argv[]){
 
 
     //Texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     std::string baseDir = _getcwd(NULL, 0);
 
     Shader shaderProgram(baseDir + "/Shaders/shader.vs", baseDir + "/Shaders/shader.fs");
+    
 
     stbi_set_flip_vertically_on_load(true);
+
+    shaderProgram.use();
 
     glActiveTexture(GL_TEXTURE0);
     unsigned int wall = loadImage(baseDir + "\\Textures\\wall.jpg", GL_RGB);
     glBindTexture(GL_TEXTURE_2D, wall);
-
-    glActiveTexture(GL_TEXTURE1);
-    unsigned int face = loadImage(baseDir + "\\Textures\\awesomeface.png", GL_RGBA);
-    glBindTexture(GL_TEXTURE_2D, face);
-
-    shaderProgram.use();
     shaderProgram.setInt("texture1", wall);
-    //shaderProgram.setInt("texture2", face);
+
+    //glActiveTexture(GL_TEXTURE1);
+    //unsigned int face = loadImage(baseDir + "\\Textures\\awesomeface.png", GL_RGBA);
+    //glBindTexture(GL_TEXTURE_2D, face);
+    //shaderProgram.setBool("texture2", face);
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
     shaderProgram.setMat4("projection", projection);
@@ -163,7 +171,7 @@ int main(int argc, char* argv[]){
         shaderProgram.use();
 
         glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        shaderProgram.setMat4("view", view);
+        shaderProgram.setMat4("view", camera.GetViewMatrix());
 
         glBindVertexArray(VAO);
 
@@ -198,6 +206,26 @@ void processInput(GLFWwindow* window){
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, true);
     }
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        camera.updateKeyboard(FORWARD, deltaTime);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+        camera.updateKeyboard(BACKWARD, deltaTime);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+        camera.updateKeyboard(LEFT, deltaTime);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+        camera.updateKeyboard(RIGHT, deltaTime);
+    }
+}
+
+void mouse_Callback(GLFWwindow* window, double xpos, double ypos){
+    camera.updateMouse(xpos, ypos);
 }
 
 
