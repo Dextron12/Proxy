@@ -3,6 +3,8 @@
 #pragma once
 
 #include <iostream>
+#include <direct.h>
+#include <string>
 
 #include <SDL2\SDL.h>
 #include <glad\glad.h>

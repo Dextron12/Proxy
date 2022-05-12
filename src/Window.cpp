@@ -29,9 +29,15 @@ void t_Window::updateEvents(){
         }
 
         if (event.type == SDL_WINDOWEVENT) {
-            if (event.window.type == SDL_WINDOWEVENT_RESIZED){
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED){
                 SDL_GetWindowSize(window, &width, &height);
                 glViewport(0, 0, width, height);
+            }
+        }
+
+        if (event.type == SDL_KEYDOWN){
+            if (event.key.keysym.sym == SDLK_ESCAPE){
+                b_appState = false;
             }
         }
     }
