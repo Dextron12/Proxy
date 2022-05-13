@@ -2,12 +2,24 @@
 #include "Window.hpp"
 #include "Shader.hpp"
 
-float vertices[] = {
+/*float vertices[] = {
     0.5f, 0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
     -0.5f, -0.5f, 0.0f,
     -0.5f, 0.5f, 0.0f
+};*/
+
+float vertices[] = {
+    -0.75f, -0.25f, 0.0f,
+    -0.25, -0.25, 0.0f,
+    -0.5f, 0.25, 0.0f,
+
+    //Second triangle
+    0.25f, -0.25f, 0.0f,
+    0.75f, -0.25f, 0.0f,
+    0.5f, 0.25f, 0.0f
 };
+
 
 unsigned int indicies[] = {
     //First triangle
@@ -45,8 +57,11 @@ int main(int argc, char** argv){
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         //glDrawArrays(GL_TRIANGLES, 0, 4);
 
         SDL_GL_SwapWindow(window.window);
