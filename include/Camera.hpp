@@ -39,6 +39,7 @@ class Camera{
             direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
             direction.y = sin(glm::radians(pitch));
             direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+            
             Front = glm::normalize(direction);
         }
 
